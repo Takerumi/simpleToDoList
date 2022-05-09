@@ -1,8 +1,9 @@
 const express = require('express'),
   app = express(),
-  port = process.env.PORT || 3000
+  port = process.env.PORT || 3000,
+  date = require(`${__dirname}/date.js`)
 
-let items = ['Buy bread', 'Buy cheese', 'By sausages'],
+let items = [],
   workItems = []
 
 app.set('view engine', 'ejs')
@@ -12,14 +13,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
 app.get('/', (req, res) => {
-  const today = new Date(),
-    options = {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    }
-  let day = today.toLocaleDateString('en-US', options)
-
+  let day = date.getDate()
   res.render('list', { listTitle: day, items: items })
 })
 
