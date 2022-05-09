@@ -1,40 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>To Do List</title>
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Raleway&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="box" id="heading">
-      <h1><%= day %></h1>
-    </div>
+<%- include('header') -%>
+  <div class="box" id="heading">
+    <h1>
+      <%= listTitle %>
+    </h1>
+  </div>
 
-    <div class="box">
-      <% items.forEach(item => { %>
+  <div class="box">
+    <% items.forEach(item=> { %>
       <div class="item">
         <input type="checkbox" />
-        <p><%= item %></p>
+        <p>
+          <%= item %>
+        </p>
       </div>
       <% }) %>
 
-      <form class="item" action="/" method="post">
-        <input
-          type="text"
-          name="newItem"
-          placeholder="New Item"
-          autocomplete="off"
-        />
-        <button type="submit">+</button>
-      </form>
-    </div>
-  </body>
-</html>
+        <form class="item" action="/" method="post">
+          <input type="text" name="newItem" placeholder="New Item" autocomplete="off" />
+          <button type="submit" name="list" value=<%=listTitle %> >+</button>
+        </form>
+  </div>
+  <%- include('footer') -%>
