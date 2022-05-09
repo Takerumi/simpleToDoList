@@ -8,6 +8,8 @@ app.set('view engine', 'ejs')
 
 app.use(express.urlencoded({ extended: true }))
 
+app.use(express.static('public'))
+
 app.get('/', (req, res) => {
   const today = new Date(),
     options = {
@@ -15,7 +17,7 @@ app.get('/', (req, res) => {
       day: 'numeric',
       month: 'long',
     }
-  let day = today.toLocaleDateString('ru-RU', options)
+  let day = today.toLocaleDateString('en-US', options)
 
   res.render('list', { day: day, items: items })
 })
