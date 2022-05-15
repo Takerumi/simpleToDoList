@@ -1,11 +1,9 @@
-const { name } = require('ejs')
-const { redirect } = require('express/lib/response')
-
 const express = require('express'),
   app = express(),
   port = process.env.PORT || 3000,
   date = require(`${__dirname}/date.js`),
-  mongoose = require('mongoose')
+  mongoose = require('mongoose'),
+  _ = require('lodash')
 
 require('dotenv').config()
 
@@ -31,7 +29,12 @@ const itemSchema = new mongoose.Schema({
   item3 = new Item({
     name: '<-- Hit this to delete an item',
   }),
-  defaultItems = [item1, item2, item3]
+  defaultItems = [item1, item2, item3],
+  listSchema = new mongoose.Schema({
+    name: String,
+    items: [itemSchema],
+  }),
+  List = mongoose.model('List', listSchema)
 
 app.get('/', (req, res) => {
   Item.find({}, (err, items) => {
@@ -62,10 +65,6 @@ app.post('/', (req, res) => {
   res.redirect('/')
 })
 
-app.get('/work', (req, res) => {
-  res.render('list', { listTitle: 'Work List', items: workItems })
-})
-
 app.post('/work', (req, res) => {
   let item = req.body.newItem
   workItems.push(item)
@@ -89,6 +88,30 @@ app.post('/delete', (req, res) => {
 
 app.get('/about', (req, res) => {
   res.render('about')
+})
+
+app.get('/:listName', (req, res) => {
+  const customListName = req.params.listName
+
+  List.findOne({ name: customListName }, (err, foundList) => {
+    if (!err) {
+      if (!foundList) {
+        // create a new list
+        const list = new List({
+          name: customListName,
+          items: defaultItems,
+        })
+        list.save()
+        res.redirect(`/${customListName}`)
+      } else {
+        // show an existing list
+        res.render('list', {
+          listTitle: foundList.name,
+          items: foundList.items,
+        })
+      }
+    }
+  })
 })
 
 app.listen(port, () => console.log(`Server is running on port ${port}`))
