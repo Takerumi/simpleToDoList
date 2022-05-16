@@ -55,14 +55,23 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', (req, res) => {
-  const itemName = req.body.newItem
+  const itemName = req.body.newItem,
+    listName = req.body.list
 
   const item = new Item({
     name: itemName,
   })
 
-  item.save()
-  res.redirect('/')
+  if (listName === date.getDate()) {
+    item.save()
+    res.redirect('/')
+  } else {
+    List.findOne({ name: listName }, (err, foundList) => {
+      foundList.items.push(item)
+      foundList.save()
+      res.redirect(`/${listName}`)
+    })
+  }
 })
 
 app.post('/work', (req, res) => {
