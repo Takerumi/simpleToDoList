@@ -81,18 +81,27 @@ app.post('/work', (req, res) => {
 })
 
 app.post('/delete', (req, res) => {
-  const checkedItemId = req.body.checkbox
-  function deleteItem(id) {
-    Item.findByIdAndRemove(id, (err) => {
-      if (err) {
-        console.log(err)
-      } else {
-        console.log('Successfully deleted checked item from DB')
+  const checkedItemId = req.body.checkbox,
+    listName = req.body.listName
+
+  if (listName === date.getDate()) {
+    Item.findByIdAndRemove(checkedItemId, (err) => {
+      if (!err) {
+        console.log('Successfully deleted checked item')
+        res.redirect('/')
       }
     })
+  } else {
+    List.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: checkedItemId } } },
+      (err, foundList) => {
+        if (!err) {
+          res.redirect(`/${listName}`)
+        }
+      }
+    )
   }
-  deleteItem(checkedItemId)
-  res.redirect('/')
 })
 
 app.get('/about', (req, res) => {
@@ -100,7 +109,7 @@ app.get('/about', (req, res) => {
 })
 
 app.get('/:listName', (req, res) => {
-  const customListName = req.params.listName
+  const customListName = _.capitalize(req.params.listName)
 
   List.findOne({ name: customListName }, (err, foundList) => {
     if (!err) {
