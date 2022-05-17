@@ -31,7 +31,7 @@ To create a custom list, you need to add /<list name> to the end of the URL
  
 In this case, application will create a new list in DB with the name taken from the routing parameters object
     
-    ![image](https://user-images.githubusercontent.com/63417290/168832979-08a8089f-77b2-4b7a-93cb-8d408d58e184.png)
+![image](https://user-images.githubusercontent.com/63417290/168832979-08a8089f-77b2-4b7a-93cb-8d408d58e184.png)
 
  
     
