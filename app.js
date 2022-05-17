@@ -17,11 +17,11 @@ app.use(express.static('public'))
 mongoose.connect(DB_HOST)
 
 // create schema for items
-const itemSchema = new mongoose.Schema({
+const itemsSchema = new mongoose.Schema({
     name: String,
   }),
   // create model for collection of items
-  Item = mongoose.model('Item', itemSchema),
+  Item = mongoose.model('Item', itemsSchema),
   // hardcoded default items
   item1 = new Item({
     name: 'Welcome to your todoList!',
@@ -36,20 +36,20 @@ const itemSchema = new mongoose.Schema({
   // create schema for lists
   listSchema = new mongoose.Schema({
     name: String,
-    items: [itemSchema],
+    items: [itemsSchema],
   }),
   // create model for collection of lists
   List = mongoose.model('List', listSchema)
 
 app.get('/', (req, res) => {
   // check if items collection is empty before inserting default items
-  Item.find({}, (err, items) => {
-    if (items.length === 0) {
+  Item.find({}, (err, foundItems) => {
+    if (foundItems.length === 0) {
       Item.insertMany(defaultItems, (err) => {
         if (err) {
           console.log(err)
         } else {
-          console.log('Successfully add items')
+          console.log('Successfully add default items')
         }
       })
       // redirect to the root to render default items in list
@@ -58,9 +58,39 @@ app.get('/', (req, res) => {
       // get date from the module and store it in a variable
       let day = date.getDate()
       // render template passing the title of list and collection of items
-      res.render('list', { listTitle: day, items: items })
+      res.render('list', { listTitle: day, items: foundItems })
     }
   })
+})
+
+app.get('/:listName', (req, res) => {
+  // extract route parameters
+  // and use lodash method to convert ctring to title case
+  const customListName = _.capitalize(req.params.listName)
+  // check if list exists in DB
+  List.findOne({ name: customListName }, (err, foundList) => {
+    if (!err) {
+      if (!foundList) {
+        // create a new list
+        const list = new List({
+          name: customListName,
+          items: defaultItems,
+        })
+        list.save()
+        res.redirect(`/${customListName}`)
+      } else {
+        // show an existing list
+        res.render('list', {
+          listTitle: foundList.name,
+          items: foundList.items,
+        })
+      }
+    }
+  })
+})
+
+app.get('/about', (req, res) => {
+  res.render('about')
 })
 
 app.post('/', (req, res) => {
@@ -71,19 +101,26 @@ app.post('/', (req, res) => {
   const item = new Item({
     name: itemName,
   })
+  console.log(req.body)
   // check by title which list is currently in use
   if (listName === date.getDate()) {
+    console.log(listName)
     // if list is stock save item in default collection
     item.save()
     res.redirect('/')
   } else {
     // search in DB for list with a suitable title
-    List.findOne({ name: listName }, (err, foundList) => {
-      // if list is found push item there
-      foundList.items.push(item)
-      foundList.save()
-      res.redirect(`/${listName}`)
-    })
+    List.findOneAndUpdate(
+      { name: listName },
+      { $push: { items: item } },
+      (err) => {
+        // if list is found push item there
+        if (!err) {
+          // console.log(listName)
+          res.redirect(`/${listName}`)
+        }
+      }
+    )
   }
 })
 
@@ -112,36 +149,6 @@ app.post('/delete', (req, res) => {
       }
     )
   }
-})
-
-app.get('/about', (req, res) => {
-  res.render('about')
-})
-
-app.get('/:listName', (req, res) => {
-  // extract route parameters
-  // and use lodash method to convert ctring to title case
-  const customListName = _.capitalize(req.params.listName)
-  // check if list exists in DB
-  List.findOne({ name: customListName }, (err, foundList) => {
-    if (!err) {
-      if (!foundList) {
-        // create a new list
-        const list = new List({
-          name: customListName,
-          items: defaultItems,
-        })
-        list.save()
-        res.redirect(`/${customListName}`)
-      } else {
-        // show an existing list
-        res.render('list', {
-          listTitle: foundList.name,
-          items: foundList.items,
-        })
-      }
-    }
-  })
 })
 
 app.listen(port, () => console.log(`Server is running on port ${port}`))
