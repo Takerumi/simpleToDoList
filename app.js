@@ -101,10 +101,8 @@ app.post('/', (req, res) => {
   const item = new Item({
     name: itemName,
   })
-  console.log(req.body)
   // check by title which list is currently in use
   if (listName === date.getDate()) {
-    console.log(listName)
     // if list is stock save item in default collection
     item.save()
     res.redirect('/')
@@ -116,7 +114,6 @@ app.post('/', (req, res) => {
       (err) => {
         // if list is found push item there
         if (!err) {
-          // console.log(listName)
           res.redirect(`/${listName}`)
         }
       }
