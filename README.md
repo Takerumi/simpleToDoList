@@ -24,7 +24,7 @@ For correct work with the database, you must specify the URI for connecting to M
 
 ## Support for multiple custom lists
     
-To create a custom list, you need to add /<listName> to the end of the URL
+To create a custom list, you need to add `/<listName>` to the end of the URL
     `http://localhost:3000/work`
     or
     `https://borman-todoapp-v2.herokuapp.com/shop`
