@@ -1,6 +1,6 @@
 # simpleToDoList
 
-A fairly simple to-do list.
+A fairly simple to-do list implemented with Express, EJS, MongoDB.
 
 ![image](https://user-images.githubusercontent.com/63417290/168827820-c3ce027e-7c07-46c0-8bf4-76fb7075fc38.png)
 
